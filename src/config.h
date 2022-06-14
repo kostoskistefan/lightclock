@@ -10,18 +10,13 @@
 #include <xcb/xcb_ewmh.h>
 #include "error_handler.h"
 
-#define ERROR_STATE             -1
-#define WINDOW_STATE_WINDOWED   0
-#define WINDOW_STATE_FULLSCREEN 1
-
 typedef struct xcb_config_t
 {
     int screen_number;
-    int8_t window_state;
     xcb_connection_t* connection;
     xcb_ewmh_connection_t* ewmh_connection;
     xcb_screen_t* screen;
-    xcb_window_t window;
+    xcb_window_t active_window;
 } xcb_config_t;
 
 void initialize(xcb_config_t *config);
