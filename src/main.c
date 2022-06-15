@@ -50,7 +50,8 @@ int main()
     initialize_graphics();
 
     create_window();
-    hide_taskbar_icon();
+    set_window_name("Lightclock");
+    set_window_class("lightclock");
 
     event_loop();
 

@@ -1,4 +1,6 @@
 #include "event_handler.h"
+#include "graphics.h"
+#include "utils.h"
 
 void handle_property_notify(xcb_generic_event_t *event)
 {
@@ -12,10 +14,13 @@ void handle_property_notify(xcb_generic_event_t *event)
     {
         retrieve_active_window();
 
-        uint8_t fullscreen_state = get_active_window_fullscreen_state();
+        uint8_t state = get_active_window_fullscreen_state();
 
-        printf("%d\n", fullscreen_state);
-        //config->keep_running = 0;
+        if (g_config->active_window_is_fullscreen != state)
+        {
+            g_config->active_window_is_fullscreen = state;
+            set_window_visibility();
+        }
     }
 }
 

@@ -4,12 +4,13 @@
 #include "prototypes.h"
 
 extern xcb_config_t *config;
+extern xcb_graphics_config_t *g_config;
 
 void cleanup();
 void setup_exit_signal();
-void hide_taskbar_icon();
 void retrieve_active_window();
-void get_atom_by_name(char *atom_name, xcb_atom_t output_atom);
-void set_window_atom(xcb_window_t window, xcb_atom_t atom);
+void set_window_name(char* wm_name);
+void set_window_class(char* wm_class);
+void set_window_visibility();
 
 #endif

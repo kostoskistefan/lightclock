@@ -1,8 +1,13 @@
 #include "utils.h"
+#include "config.h"
+#include "graphics.h"
+#include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
 #include <string.h>
+#include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <xcb/xcb_icccm.h>
 
 void retrieve_active_window()
 {
@@ -17,40 +22,39 @@ void retrieve_active_window()
     free(reply);
 }
 
-void get_atom_by_name(char *atom_name, xcb_atom_t output_atom)
+void set_window_name(char* wm_name)
 {
-    xcb_intern_atom_cookie_t cookie =
-        xcb_intern_atom(config->connection, 1, strlen(atom_name), atom_name);
+    xcb_icccm_set_wm_name(
+            config->connection,
+            g_config->window, 
+            XCB_ATOM_STRING, 
+            8, 
+            strlen(wm_name), 
+            wm_name);
 
-    xcb_intern_atom_reply_t *reply =
-        xcb_intern_atom_reply(config->connection, cookie, NULL);
-
-    output_atom = reply->atom;
-
-    free(reply);
+    xcb_flush(config->connection);
 }
 
-void set_window_atom(xcb_window_t window, xcb_atom_t atom)
+void set_window_class(char* wm_class)
 {
-    xcb_change_property(
-        config->connection,
-        XCB_PROP_MODE_REPLACE,
-        window,
-        atom,
-        XCB_ATOM_ATOM,
-        32,
-        1,
-        &atom);
+    xcb_icccm_set_wm_class(
+            config->connection, 
+            g_config->window, 
+            strlen(wm_class), 
+            wm_class);
 
-    xcb_map_window(config->connection, window);
+    xcb_flush(config->connection);
 }
 
-void hide_taskbar_icon()
+void set_window_visibility()
 {
-    xcb_atom_t skip_taskbar_atom;
+    if (!g_config->active_window_is_fullscreen)
+        xcb_unmap_window(config->connection, g_config->window);
 
-    get_atom_by_name("_NET_WM_STATE_SKIP_TASKBAR", skip_taskbar_atom);
-    set_window_atom(config->active_window, skip_taskbar_atom);
+    else 
+        xcb_map_window(config->connection, g_config->window);
+        
+    xcb_flush(config->connection);
 }
 
 void cleanup()
@@ -65,9 +69,9 @@ void signal_handler(int signal_type)
 {
     switch(signal_type)
     {
-    case SIGINT:
-        config->keep_running = 0;
-        break;
+        case SIGINT:
+            config->keep_running = 0;
+            break;
     }
 }
 

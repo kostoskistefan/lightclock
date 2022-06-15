@@ -17,6 +17,7 @@ typedef struct xcb_config_t
 
 typedef struct xcb_graphics_config_t 
 {
+    uint8_t active_window_is_fullscreen;
     xcb_window_t window;
     xcb_visualtype_t *visual;
 } xcb_graphics_config_t;
