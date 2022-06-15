@@ -1,16 +1,11 @@
-#include <stdio.h>
-#include <stdint.h>
+#include <signal.h>
 #include <string.h>
 #include <xcb/xcb.h>
-#include <xcb/xproto.h>
-#include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_event.h>
 #include "prototypes.h"
-#include "utils.h"
 #include "config.h"
 #include "graphics.h"
 #include "event_handler.h"
-#include "error_handler.h"
 
 xcb_config_t *config;
 xcb_graphics_config_t *g_config;
@@ -46,6 +41,8 @@ void event_loop()
 
 int main()
 {
+    setup_exit_signal();
+
     config = malloc(sizeof(xcb_config_t));
     g_config = malloc(sizeof(xcb_graphics_config_t));
 

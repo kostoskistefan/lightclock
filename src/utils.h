@@ -6,6 +6,7 @@
 extern xcb_config_t *config;
 
 void cleanup();
+void setup_exit_signal();
 void hide_taskbar_icon();
 void retrieve_active_window();
 void get_atom_by_name(char *atom_name, xcb_atom_t output_atom);

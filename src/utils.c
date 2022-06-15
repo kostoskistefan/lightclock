@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <stdint.h>
+#include <signal.h>
 #include <string.h>
 #include <xcb/xproto.h>
 
@@ -58,4 +59,22 @@ void cleanup()
     free(config->ewmh_connection);
     xcb_flush(config->connection);
     xcb_disconnect(config->connection);
+}
+
+void signal_handler(int signal_type) 
+{
+    switch(signal_type)
+    {
+    case SIGINT:
+        config->keep_running = 0;
+        break;
+    }
+}
+
+void setup_exit_signal() 
+{ 
+    struct sigaction signal_action;
+    memset(&signal_action, 0, sizeof(signal_action));
+    signal_action.sa_handler = &signal_handler;
+    sigaction(SIGINT, &signal_action, NULL);
 }
