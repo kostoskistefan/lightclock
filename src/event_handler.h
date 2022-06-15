@@ -6,8 +6,9 @@
 #include "config.h"
 #include "window_state.h"
 
-void handle_property_notify(xcb_config_t *config, xcb_generic_event_t *event);
+extern xcb_config_t *config;
 
-void handle_expose(xcb_config_t *config);
+void handle_property_notify(xcb_generic_event_t *event);
+void handle_expose();
 
 #endif

@@ -1,7 +1,9 @@
 #include "utils.h"
 #include <stdint.h>
+#include <string.h>
+#include <xcb/xproto.h>
 
-void retrieve_active_window(xcb_config_t *config)
+void retrieve_active_window()
 {
     xcb_get_input_focus_cookie_t cookie =
         xcb_get_input_focus(config->connection);
@@ -14,7 +16,7 @@ void retrieve_active_window(xcb_config_t *config)
     free(reply);
 }
 
-xcb_atom_t get_atom_by_name(xcb_config_t *config, char *atom_name)
+void get_atom_by_name(char *atom_name, xcb_atom_t output_atom)
 {
     xcb_intern_atom_cookie_t cookie =
         xcb_intern_atom(config->connection, 1, strlen(atom_name), atom_name);
@@ -22,12 +24,12 @@ xcb_atom_t get_atom_by_name(xcb_config_t *config, char *atom_name)
     xcb_intern_atom_reply_t *reply =
         xcb_intern_atom_reply(config->connection, cookie, NULL);
 
-    free(reply);
+    output_atom = reply->atom;
 
-    return reply->atom;
+    free(reply);
 }
 
-void set_window_atom(xcb_config_t *config, xcb_window_t window, xcb_atom_t atom)
+void set_window_atom(xcb_window_t window, xcb_atom_t atom)
 {
     xcb_change_property(
         config->connection,
@@ -42,13 +44,18 @@ void set_window_atom(xcb_config_t *config, xcb_window_t window, xcb_atom_t atom)
     xcb_map_window(config->connection, window);
 }
 
-void hide_taskbar_icon(xcb_config_t *config)
+void hide_taskbar_icon()
 {
-    xcb_atom_t skip_taskbar_atom = get_atom_by_name(config, "_NET_WM_STATE_SKIP_TASKBAR");
-    set_window_atom(config, config->active_window, skip_taskbar_atom);
+    xcb_atom_t skip_taskbar_atom;
+
+    get_atom_by_name("_NET_WM_STATE_SKIP_TASKBAR", skip_taskbar_atom);
+    set_window_atom(config->active_window, skip_taskbar_atom);
 }
 
-uint32_t argb_to_hex(uint8_t red, uint8_t green, uint8_t blue, float opacity)
+void cleanup()
 {
-    return (((int)(opacity * 255) & 0xff) << 24) + ((red & 0xff) << 16) + ((green & 0xff) << 8) + (blue & 0xff);
+    xcb_ewmh_connection_wipe(config->ewmh_connection);
+    free(config->ewmh_connection);
+    xcb_flush(config->connection);
+    xcb_disconnect(config->connection);
 }

@@ -1,6 +1,6 @@
 #include "event_handler.h"
 
-void handle_property_notify(xcb_config_t *config, xcb_generic_event_t *event)
+void handle_property_notify(xcb_generic_event_t *event)
 {
     xcb_property_notify_event_t *property_notify_event =
         (xcb_property_notify_event_t *)event;
@@ -10,14 +10,15 @@ void handle_property_notify(xcb_config_t *config, xcb_generic_event_t *event)
 
     if (property_notify_event->atom == list_stacking_atom)
     {
-        retrieve_active_window(config);
+        retrieve_active_window();
 
-        uint8_t fullscreen_state = get_active_window_fullscreen_state(config);
+        uint8_t fullscreen_state = get_active_window_fullscreen_state();
 
         printf("%d\n", fullscreen_state);
+        //config->keep_running = 0;
     }
 }
 
-void handle_expose(xcb_config_t *config)
+void handle_expose()
 {
 }

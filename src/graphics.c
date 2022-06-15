@@ -1,15 +1,16 @@
 #include "graphics.h"
 #include "error_handler.h"
 #include "utils.h"
+#include <string.h>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
-void initialize_graphics(xcb_config_t *config, xcb_graphics_config_t *g_config)
+void initialize_graphics()
 {
     g_config->window = xcb_generate_id(config->connection);
 }
 
-void hide_window_decorations(xcb_config_t *config, xcb_graphics_config_t *g_config)
+void hide_window_decorations()
 {
     char *atom = "_MOTIF_WM_HINTS";
 
@@ -62,7 +63,7 @@ xcb_visualtype_t *draw_argb_visual(const xcb_screen_t *s)
 	return NULL;
 }
 
-void create_window(xcb_config_t *config, xcb_graphics_config_t *g_config)
+void create_window()
 {
     xcb_visualtype_t *visual = draw_argb_visual(config->screen);
 	xcb_colormap_t cmap = xcb_generate_id(config->connection);
@@ -76,10 +77,8 @@ void create_window(xcb_config_t *config, xcb_graphics_config_t *g_config)
             cmap, config->screen->root, 
             visual->visual_id);
 
-    uint32_t background_color = argb_to_hex(0, 0, 0, 0.2);
-
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL | XCB_CW_OVERRIDE_REDIRECT | XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
-    uint32_t values[5] = { background_color, 0x00000000, 1, XCB_EVENT_MASK_BUTTON_PRESS, cmap };
+    uint32_t values[5] = { 0x90ff0000, 0, 1, XCB_EVENT_MASK_BUTTON_PRESS, cmap };
  
     xcb_create_window(
             config->connection,
@@ -94,7 +93,7 @@ void create_window(xcb_config_t *config, xcb_graphics_config_t *g_config)
             mask,
             values);
 
-    hide_window_decorations(config, g_config);
+    hide_window_decorations();
 
     xcb_map_window(config->connection, g_config->window);
 

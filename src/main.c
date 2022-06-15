@@ -5,50 +5,62 @@
 #include <xcb/xproto.h>
 #include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_event.h>
+#include "prototypes.h"
+#include "utils.h"
 #include "config.h"
+#include "graphics.h"
 #include "event_handler.h"
 #include "error_handler.h"
-#include "graphics.h"
-#include "utils.h"
 
-void event_loop(xcb_config_t *config)
+xcb_config_t *config;
+xcb_graphics_config_t *g_config;
+
+void event_loop()
 {
     xcb_generic_event_t *event;
 
-    while ((event = xcb_wait_for_event(config->connection)))
+    while (config->keep_running)
     {
-        switch (event->response_type & XCB_EVENT_RESPONSE_TYPE_MASK)
+        event = xcb_poll_for_event(config->connection);
+
+        if (event)
         {
-        case XCB_EXPOSE:
-            handle_expose(config);
-            break;
+            switch (event->response_type & XCB_EVENT_RESPONSE_TYPE_MASK)
+            {
+                case XCB_EXPOSE:
+                    handle_expose();
+                    break;
 
-        case XCB_PROPERTY_NOTIFY:
-            handle_property_notify(config, event);
-            break;
+                case XCB_PROPERTY_NOTIFY:
+                    handle_property_notify(event);
+                    break;
 
-        default:
-            break;
+                default:
+                    break;
+            }
+
+            free(event);
         }
-
-        free(event);
     }
 }
 
 int main()
 {
-    xcb_config_t config;
-    xcb_graphics_config_t g_config;
+    config = malloc(sizeof(xcb_config_t));
+    g_config = malloc(sizeof(xcb_graphics_config_t));
 
-    initialize(&config);
-    initialize_graphics(&config, &g_config);
+    initialize();
+    initialize_graphics();
 
-    create_window(&config, &g_config);
-    hide_taskbar_icon(&config);
+    create_window();
+    hide_taskbar_icon();
 
-    event_loop(&config);
+    event_loop();
 
-    disconnect(&config);
+    cleanup();
+
+    free(g_config);
+    free(config);
 
     return EXIT_SUCCESS;
 }

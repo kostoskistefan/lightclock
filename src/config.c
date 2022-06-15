@@ -1,6 +1,9 @@
 #include "config.h"
+#include <stdio.h>
+#include <string.h>
+#include "error_handler.h"
 
-void connect_to_X(xcb_config_t *config)
+void connect_to_X()
 {
     config->connection = xcb_connect(NULL, &config->screen_number);
 
@@ -8,7 +11,7 @@ void connect_to_X(xcb_config_t *config)
         exit_with_error_message("Failed to open display");
 }
 
-void setup_screen(xcb_config_t *config)
+void setup_screen()
 {
     config->screen =
         xcb_setup_roots_iterator(xcb_get_setup(config->connection)).data;
@@ -19,7 +22,7 @@ void setup_screen(xcb_config_t *config)
     config->active_window = config->screen->root;
 }
 
-void initialize_ewmh(xcb_config_t *config)
+void initialize_ewmh()
 {
     config->ewmh_connection = malloc(sizeof(xcb_ewmh_connection_t));
 
@@ -35,14 +38,16 @@ void initialize_ewmh(xcb_config_t *config)
         exit_with_error_message("Failed to initialize EWMH atoms");
 }
 
-void initialize_config(xcb_config_t *config)
+void initialize_config()
 {
-    connect_to_X(config);
-    setup_screen(config);
-    initialize_ewmh(config);
+    connect_to_X();
+    setup_screen();
+    initialize_ewmh();
+
+    config->keep_running = 1;
 }
 
-void setup_event_listening(xcb_config_t *config, char *atom_name)
+void setup_event_listening(char *atom_name)
 {
     xcb_intern_atom_cookie_t cookie =
         xcb_intern_atom(config->connection, 0, strlen(atom_name), atom_name);
@@ -53,9 +58,9 @@ void setup_event_listening(xcb_config_t *config, char *atom_name)
     free(reply);
 }
 
-void initialize(xcb_config_t *config)
+void initialize()
 {
-    initialize_config(config);
+    initialize_config();
 
     uint32_t mask = XCB_CW_EVENT_MASK;
     uint32_t values[1] = {XCB_EVENT_MASK_PROPERTY_CHANGE};
@@ -66,14 +71,6 @@ void initialize(xcb_config_t *config)
         mask,
         values);
 
-    setup_event_listening(config, (char *)"_NET_ACTIVE_DESKTOP");
+    setup_event_listening((char *)"_NET_ACTIVE_DESKTOP");
 }
 
-void disconnect(xcb_config_t *config)
-{
-    xcb_ewmh_connection_wipe(config->ewmh_connection);
-    free(config->ewmh_connection);
-    free(config->screen);
-    xcb_flush(config->connection);
-    xcb_disconnect(config->connection);
-}
