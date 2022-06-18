@@ -40,22 +40,12 @@ void initialize_ewmh()
 
 void initialize_config()
 {
+    config->keep_running = 1;
+    config->screen_number = 0;
+
     connect_to_X();
     setup_screen();
     initialize_ewmh();
-
-    config->keep_running = 1;
-}
-
-void setup_event_listening(char *atom_name)
-{
-    xcb_intern_atom_cookie_t cookie =
-        xcb_intern_atom(config->connection, 0, strlen(atom_name), atom_name);
-
-    xcb_intern_atom_reply_t *reply =
-        xcb_intern_atom_reply(config->connection, cookie, NULL);
-
-    free(reply);
 }
 
 void initialize()
@@ -63,14 +53,12 @@ void initialize()
     initialize_config();
 
     uint32_t mask = XCB_CW_EVENT_MASK;
-    uint32_t values[1] = {XCB_EVENT_MASK_PROPERTY_CHANGE};
+    uint32_t values[1] = { XCB_EVENT_MASK_PROPERTY_CHANGE };
 
     xcb_change_window_attributes(
         config->connection,
         config->screen->root,
         mask,
         values);
-
-    setup_event_listening((char *)"_NET_ACTIVE_DESKTOP");
 }
 

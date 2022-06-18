@@ -17,15 +17,15 @@ typedef struct xcb_config_t
 
 typedef struct xcb_graphics_config_t 
 {
-    uint8_t active_window_is_fullscreen;
     xcb_window_t window;
     xcb_visualtype_t *visual;
+    xcb_gc_t graphics_context;
 } xcb_graphics_config_t;
 
-typedef struct xcb_mask_value_t
+typedef struct vector2_t
 {
-    uint32_t mask;
-    uint32_t *values;
-} xcb_mask_value_t;
+    uint32_t x;
+    uint32_t y;
+} vector2_t;
 
 #endif

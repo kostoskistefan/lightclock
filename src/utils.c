@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "config.h"
 #include "graphics.h"
+#include "window_state.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
@@ -48,12 +49,32 @@ void set_window_class(char* wm_class)
 
 void set_window_visibility()
 {
-    if (!g_config->active_window_is_fullscreen)
-        xcb_unmap_window(config->connection, g_config->window);
+    if (get_active_window_fullscreen_state())
+    {
+        xcb_map_window(config->connection, g_config->window);
+        invalidate();
+    }
 
     else 
-        xcb_map_window(config->connection, g_config->window);
+        xcb_unmap_window(config->connection, g_config->window);
         
+    xcb_flush(config->connection);
+}
+
+void invalidate()
+{
+    xcb_expose_event_t event = {
+        .response_type = XCB_EXPOSE,
+        .window = g_config->window
+    };
+
+    xcb_send_event(
+            config->connection, 
+            0, 
+            g_config->window, 
+            XCB_EVENT_MASK_EXPOSURE, 
+            (char *) &event);
+
     xcb_flush(config->connection);
 }
 
@@ -63,22 +84,6 @@ void cleanup()
     free(config->ewmh_connection);
     xcb_flush(config->connection);
     xcb_disconnect(config->connection);
-}
-
-void signal_handler(int signal_type) 
-{
-    switch(signal_type)
-    {
-        case SIGINT:
-            config->keep_running = 0;
-            break;
-    }
-}
-
-void setup_exit_signal() 
-{ 
-    struct sigaction signal_action;
-    memset(&signal_action, 0, sizeof(signal_action));
-    signal_action.sa_handler = &signal_handler;
-    sigaction(SIGINT, &signal_action, NULL);
+    free(g_config);
+    free(config);
 }
