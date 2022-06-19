@@ -1,6 +1,4 @@
-#include "config.h"
-#include <stdio.h>
-#include <string.h>
+#include "initialization.h"
 #include "error_handler.h"
 
 void connect_to_X()
@@ -18,8 +16,6 @@ void setup_screen()
 
     if (!config->screen)
         exit_with_error_message("Failed to acquire screen");
-
-    config->active_window = config->screen->root;
 }
 
 void initialize_ewmh()
@@ -29,16 +25,16 @@ void initialize_ewmh()
     xcb_intern_atom_cookie_t *ewmh_atoms =
         xcb_ewmh_init_atoms(config->connection, config->ewmh_connection);
 
-    int ewmh_connection_unsuccessful = !xcb_ewmh_init_atoms_replies(
+    int ewmh_connection_successful = xcb_ewmh_init_atoms_replies(
         config->ewmh_connection,
         ewmh_atoms,
         NULL);
 
-    if (ewmh_connection_unsuccessful)
+    if (!ewmh_connection_successful)
         exit_with_error_message("Failed to initialize EWMH atoms");
 }
 
-void initialize_config()
+void initialize_xcb_config()
 {
     config->keep_running = 1;
     config->screen_number = 0;
@@ -48,9 +44,9 @@ void initialize_config()
     initialize_ewmh();
 }
 
-void initialize()
+void initialize_xcb()
 {
-    initialize_config();
+    initialize_xcb_config();
 
     uint32_t mask = XCB_CW_EVENT_MASK;
     uint32_t values[1] = { XCB_EVENT_MASK_PROPERTY_CHANGE };
@@ -62,3 +58,13 @@ void initialize()
         values);
 }
 
+void initialize_graphics()
+{
+    g_config->window = xcb_generate_id(config->connection);
+}
+
+void initialize_lightclock()
+{
+    initialize_xcb();
+    initialize_graphics();
+}

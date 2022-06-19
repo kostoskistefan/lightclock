@@ -1,9 +1,9 @@
-#include "signal_handler.h"
-#include "utils.h"
+#include <time.h>
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <time.h>
+#include "graphics.h"
+#include "signal_handler.h"
 
 timer_t timer;
 

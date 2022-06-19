@@ -1,8 +1,7 @@
 #ifndef ERROR_HANDLER_H
 #define ERROR_HANDLER_H
 
-#include <xcb/xcb.h>
-#include "config.h"
+#include "prototypes.h"
 
 extern xcb_config_t *config;
 

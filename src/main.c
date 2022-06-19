@@ -1,7 +1,7 @@
 #include "utils.h"
-#include "config.h"
 #include "graphics.h"
 #include "event_handler.h"
+#include "initialization.h"
 #include "signal_handler.h"
 
 xcb_config_t *config;
@@ -12,8 +12,7 @@ int main()
     config = malloc(sizeof(xcb_config_t));
     g_config = malloc(sizeof(xcb_graphics_config_t));
 
-    initialize();
-    initialize_graphics();
+    initialize_lightclock();
 
     create_window();
 

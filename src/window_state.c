@@ -1,24 +1,24 @@
+#include <xcb/xcb.h>
+#include "utils.h"
 #include "window_state.h"
 #include "error_handler.h"
-#include "utils.h"
-#include <xcb/xcb.h>
 
 xcb_ewmh_get_atoms_reply_t get_active_window_states()
 {
     xcb_ewmh_get_atoms_reply_t window_states;
 
-    retrieve_active_window();
+    xcb_window_t active_window = get_active_window();
 
     xcb_get_property_cookie_t cookie =
-        xcb_ewmh_get_wm_state(config->ewmh_connection, config->active_window);
+        xcb_ewmh_get_wm_state(config->ewmh_connection, active_window);
 
-    uint8_t wm_state_reply_has_error = xcb_ewmh_get_wm_state_reply(
+    uint8_t wm_state_reply_successful = xcb_ewmh_get_wm_state_reply(
         config->ewmh_connection,
         cookie,
         &window_states,
         NULL);
 
-    if (!wm_state_reply_has_error)
+    if (!wm_state_reply_successful)
         exit_with_error_message("Failed to get window states");
 
     return window_states;

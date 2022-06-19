@@ -3,14 +3,14 @@
 
 #include "prototypes.h"
 
-#define CLOCK_WINDOW_HEIGHT 80
 #define CLOCK_WINDOW_WIDTH 50
+#define CLOCK_WINDOW_HEIGHT 80
 
 extern xcb_config_t *config;
 extern xcb_graphics_config_t * g_config;
 
-void initialize_graphics();
+void invalidate();
 void create_window();
-void set_font_graphics_context(char *font_name);
+void draw_time(char *format);
 
 #endif
