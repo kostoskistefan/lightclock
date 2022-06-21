@@ -57,22 +57,25 @@ void set_window_class(char *wm_class)
 void set_window_visibility()
 {
     if (get_active_window_fullscreen_state())
-        xcb_map_window(config->connection, g_config->window);
+        xcb_map_window_checked(config->connection, g_config->window);
 
     else
-        xcb_unmap_window(config->connection, g_config->window);
+        xcb_unmap_window_checked(config->connection, g_config->window);
 
     invalidate();
 }
 
 void cleanup()
 {
+    printf("\n");
+
     xcb_ewmh_connection_wipe(config->ewmh_connection);
     free(config->ewmh_connection);
 
     xcb_flush(config->connection);
     xcb_disconnect(config->connection);
 
+    free(user_settings);
     free(g_config);
     free(config);
 }
@@ -96,11 +99,16 @@ xcb_gcontext_t create_graphics_context(xcb_font_t font)
 {
     xcb_gcontext_t graphics_context = xcb_generate_id(config->connection);
 
-    uint32_t mask = XCB_GC_FOREGROUND | XCB_GC_FONT;
+    uint32_t mask = 
+        XCB_GC_FOREGROUND |
+        XCB_GC_BACKGROUND |
+        XCB_GC_FONT;
 
-    uint32_t values[2] = {
-        config->screen->white_pixel,
-        font};
+    uint32_t values[3] = {
+        user_settings->foreground_color,
+        user_settings->background_color,
+        font
+    };
 
     xcb_void_cookie_t graphics_context_cookie =
         xcb_create_gc_checked(
@@ -125,4 +133,18 @@ void set_font_graphics_context(char *font_name)
     g_config->graphics_context = graphics_context;
 
     xcb_close_font(config->connection, font);
+}
+
+point_t center_text_in_window(char *text)
+{
+    point_t coordinates;
+
+    uint8_t length = strlen(text);
+
+    uint32_t text_width = length * 5 + length;
+
+    coordinates.x = (CLOCK_WINDOW_WIDTH - text_width) / 2;
+    coordinates.y = CLOCK_WINDOW_HEIGHT / 2 + 5;
+
+    return coordinates;
 }

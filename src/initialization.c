@@ -1,9 +1,10 @@
 #include "initialization.h"
 #include "error_handler.h"
+#include "user_settings.h"
 
 void connect_to_X()
 {
-    config->connection = xcb_connect(NULL, &config->screen_number);
+    config->connection = xcb_connect(NULL, NULL);
 
     if (xcb_connection_has_error(config->connection))
         exit_with_error_message("Failed to open display");
@@ -37,7 +38,6 @@ void initialize_ewmh()
 void initialize_xcb_config()
 {
     config->keep_running = 1;
-    config->screen_number = 0;
 
     connect_to_X();
     setup_screen();
@@ -65,6 +65,7 @@ void initialize_graphics()
 
 void initialize_lightclock()
 {
+    initialize_user_settings();
     initialize_xcb();
     initialize_graphics();
 }

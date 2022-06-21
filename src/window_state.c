@@ -31,16 +31,18 @@ uint8_t get_active_window_fullscreen_state()
     xcb_atom_t fullscreen_atom =
         config->ewmh_connection->_NET_WM_STATE_FULLSCREEN;
 
+    uint8_t current_window_state = WINDOW_STATE_WINDOWED;
+
     for (uint32_t i = 0; i < window_states.atoms_len; i++)
     {
         uint8_t window_is_fullscreen =
             window_states.atoms[i] == fullscreen_atom;
 
         if (window_is_fullscreen)
-            return WINDOW_STATE_FULLSCREEN;
+            current_window_state = WINDOW_STATE_FULLSCREEN;
     }
 
     xcb_ewmh_get_atoms_reply_wipe(&window_states);
 
-    return WINDOW_STATE_WINDOWED;
+    return current_window_state;
 }

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <xcb/xproto.h>
 #include <xcb/xcb_event.h>
+#include "signal_handler.h"
 #include "utils.h"
 #include "clock.h"
 #include "graphics.h"
@@ -24,7 +25,11 @@ void handle_expose()
 {
     set_font_graphics_context("fixed");
 
-    draw_time("%H:%M:%S");
+    if (user_settings->show_time)
+        draw_date_time(user_settings->time_format, -6);
+
+    if (user_settings->show_date)
+        draw_date_time(user_settings->date_format, 6);
 
     xcb_free_gc(config->connection, g_config->graphics_context);
 }
@@ -52,6 +57,8 @@ void event_loop()
 
     while (config->keep_running)
     {
+        trigger_clock_update();
+
         event = xcb_poll_for_event(config->connection);
 
         if (!event)
