@@ -6,6 +6,7 @@
 extern xcb_config_t *config;
 extern xcb_graphics_config_t *g_config;
 extern settings_t *user_settings;
+extern pthread_mutex_t lock;
 
 void cleanup();
 void set_window_visibility();

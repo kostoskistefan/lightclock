@@ -1,30 +1,43 @@
+#include <bits/types/timer_t.h>
+#include <pthread.h>
 #include <time.h>
 #include <string.h>
 #include <signal.h>
-#include <stdio.h>
+#include <unistd.h>
 #include "graphics.h"
 #include "signal_handler.h"
 
+timer_t timer;
+
 void set_timer()
 {
-    previous_update_time = time(0);
+    struct sigevent signal_event = {
+        .sigev_notify = SIGEV_THREAD,
+        .sigev_notify_function = invalidate,
+        .sigev_notify_attributes = NULL,
+        .sigev_value.sival_ptr = &timer
+    };
+
+    timer_create(CLOCK_REALTIME, &signal_event, &timer);
+
+    struct itimerspec t = { { 1, 0 }, { 1, 0 } };
+    timer_settime(timer, 0, &t, 0);
 }
 
-void trigger_clock_update()
+void delete_timer()
 {
-    time_t current_time = time(0);
-
-    if (current_time - previous_update_time == 1)
-    {
-        previous_update_time = current_time;
-        invalidate();
-    }
+    timer_delete(timer);
 }
 
 void signal_handler(int signal_type) 
 {
-    if (signal_type == SIGINT)
-        config->keep_running = 0;
+    switch (signal_type)
+    { 
+        case SIGINT:
+            config->keep_running = 0;
+            invalidate();
+            break;
+    }
 }
 
 void set_sigint_signal() 

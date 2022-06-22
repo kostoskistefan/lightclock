@@ -4,7 +4,7 @@ OBJ_DIR := ./obj
 SRC_FILES := $(wildcard $(SRC_DIR)/*.c)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
-CFLAGS := -lxcb -lxcb-util -lxcb-ewmh -lxcb-icccm
+CFLAGS := -Wall -Wextra -Werror -fno-exceptions -lxcb -lxcb-util -lxcb-ewmh -lxcb-icccm
 
 all: $(OBJ_FILES)
 	gcc $(CFLAGS) -o lightclock $^

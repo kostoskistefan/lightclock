@@ -1,15 +1,26 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
-#include "clock.h"
-#include "initialization.h"
-#include "prototypes.h"
-#include "user_settings.h"
+#include "event_handler.h"
 #include "utils.h"
+#include "clock.h"
 #include "graphics.h"
+#include "prototypes.h"
 #include "window_state.h"
 #include "error_handler.h"
+#include "user_settings.h"
+#include "initialization.h"
+
+xcb_expose_event_t invalidate_event;
+
+void intialize_invalidation_event()
+{
+    invalidate_event.response_type = XCB_EXPOSE;
+    invalidate_event.window = g_config->window;
+}
 
 xcb_visualid_t get_screen_visual_id()
 {
@@ -123,19 +134,12 @@ void draw_date_time(char *format, int8_t y_offset)
 
 void invalidate()
 {
-    xcb_expose_event_t *event = malloc(sizeof(xcb_expose_event_t));
-
-    event->response_type = XCB_EXPOSE;
-    event->window = g_config->window;
-
     xcb_send_event(
             config->connection, 
             0, 
             g_config->window, 
             XCB_EVENT_MASK_EXPOSURE, 
-            (char *) event);
+            (char *) &invalidate_event);
 
     xcb_flush(config->connection);
-
-    free(event);
 }

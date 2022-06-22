@@ -1,4 +1,5 @@
 #include <string.h>
+#include <xcb/xcb.h>
 #include <xcb/xproto.h>
 #include <xcb/xcb_event.h>
 #include "signal_handler.h"
@@ -55,17 +56,13 @@ void event_loop()
 {
     xcb_generic_event_t *event;
 
-    while (config->keep_running)
+    while ((event = xcb_wait_for_event(config->connection)))
     {
-        trigger_clock_update();
-
-        event = xcb_poll_for_event(config->connection);
-
-        if (!event)
-            continue;
-
         handle_generic_event(event);
 
         free(event);
+
+        if (!config->keep_running)
+            break;
     }
 }

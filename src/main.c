@@ -9,7 +9,6 @@
 xcb_config_t *config;
 xcb_graphics_config_t *g_config;
 settings_t *user_settings;
-time_t previous_update_time;
 
 int main()
 {

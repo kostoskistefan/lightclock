@@ -12,6 +12,7 @@ extern settings_t *user_settings;
 
 void invalidate();
 void create_window();
+void intialize_invalidation_event();
 void draw_date_time(char *format, int8_t y_offset);
 
 #endif

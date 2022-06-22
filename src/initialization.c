@@ -1,6 +1,8 @@
 #include "initialization.h"
 #include "error_handler.h"
+#include "graphics.h"
 #include "user_settings.h"
+#include <xcb/xproto.h>
 
 void connect_to_X()
 {
@@ -61,6 +63,7 @@ void initialize_xcb()
 void initialize_graphics()
 {
     g_config->window = xcb_generate_id(config->connection);
+    intialize_invalidation_event();
 }
 
 void initialize_lightclock()

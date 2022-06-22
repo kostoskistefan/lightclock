@@ -5,6 +5,7 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 #include <xcb/xcb_icccm.h>
+#include "signal_handler.h"
 #include "utils.h"
 #include "graphics.h"
 #include "window_state.h"
@@ -68,6 +69,8 @@ void set_window_visibility()
 void cleanup()
 {
     printf("\n");
+
+    delete_timer();
 
     xcb_ewmh_connection_wipe(config->ewmh_connection);
     free(config->ewmh_connection);
