@@ -1,5 +1,3 @@
-#include <bits/types/timer_t.h>
-#include <pthread.h>
 #include <time.h>
 #include <string.h>
 #include <signal.h>
